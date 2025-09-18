@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorHandler';
 import AppError from './utils/AppError';
+import userRouter from './routes/users.route';
 
 const app = express();
 
@@ -11,10 +12,13 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan('dev')); // morgan = HTTP request logger middleware for node.js
 app.use(helmet()); // helmet = secure HTTP headers.
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello!');
+  res.send('Server is running!');
 });
+
+app.use('/api/v1/users', userRouter);
 
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

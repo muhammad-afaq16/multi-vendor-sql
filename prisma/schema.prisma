@@ -12,3 +12,36 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id           Int     @id @default(autoincrement())
+  name         String
+  email        String  @unique
+  password     String
+  phoneNumber  String?
+  avatar       String?
+  role         String  @default("user")
+  refreshToken String? @map("refresh_token")
+
+  addresses          Address[] // It let you to do nested queries (getting address) While staying at user
+  resetPasswordToken String?
+  resetPasswordTime  DateTime?
+  createdAt          DateTime  @default(now())
+
+  @@map("users")
+}
+
+model Address {
+  id          Int     @id @default(autoincrement())
+  country     String?
+  city        String?
+  address1    String?
+  address2    String?
+  zipCode     String?
+  addressType String?
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
