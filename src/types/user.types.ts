@@ -11,3 +11,14 @@ export type User = {
   resetPasswordTime?: Date | null;
   createdAt?: Date;
 };
+
+export type Address = {
+  id?: number;
+  country: string | null;
+  city: string | null;
+  state: string | null;
+  street: string | null;
+  zipCode: string | null;
+  addressType: string | null;
+  userId: number;
+};

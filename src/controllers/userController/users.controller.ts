@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { prisma } from '../config/prismaClient';
 import bcrypt from 'bcryptjs';
-import AppError from '../utils/AppError';
-import ApiResponse from '../utils/ApiResponse';
-import { userService } from '../services/user.services';
-import catchAsync from '../utils/catchAsync';
+import AppError from '../../utils/AppError';
+import ApiResponse from '../../utils/ApiResponse';
+import { userService } from '../../services/userServices/users.services';
+import catchAsync from '../../utils/catchAsync';
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

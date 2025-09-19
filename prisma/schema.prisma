@@ -35,8 +35,8 @@ model Address {
   id          Int     @id @default(autoincrement())
   country     String?
   city        String?
-  address1    String?
-  address2    String?
+  state      String?
+  street      String?
   zipCode     String?
   addressType String?
 

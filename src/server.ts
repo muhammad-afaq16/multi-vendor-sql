@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import app from './app';
 
 // handling uncaught exception
@@ -7,10 +6,6 @@ process.on('uncaughtException', (err) => {
   console.log(`Shutting down due to uncaught exception`);
   process.exit(1);
 });
-
-if (process.env.NODE_ENV !== 'PRODUCTION') {
-  dotenv.config();
-}
 
 const PORT = process.env.PORT || 4000;
 

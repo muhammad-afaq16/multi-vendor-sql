@@ -4,8 +4,14 @@ import morgan from 'morgan';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorHandler';
 import AppError from './utils/AppError';
-import userRouter from './routes/users.route';
 import { v2 as cloudinary } from 'cloudinary';
+import userRouter from './routes/userRoutes/users.route';
+import addressRouter from './routes/userRoutes/address.route';
+import dotenv from 'dotenv';
+
+if (process.env.NODE_ENV !== 'PRODUCTION') {
+  dotenv.config();
+}
 
 const app = express();
 
@@ -26,6 +32,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/address', addressRouter);
 
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
