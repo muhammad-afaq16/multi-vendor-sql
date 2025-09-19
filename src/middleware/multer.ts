@@ -6,7 +6,7 @@ const storage = multer.diskStorage({
     cb(null, path.join(__dirname, '../public/uploads'));
   },
   filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname); // get original extension
+    const ext = path.extname(file.originalname); 
     cb(null, file.fieldname + '-' + Date.now() + ext);
   },
 });
@@ -35,7 +35,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 4 * 1024 * 1024, // 4 MB
+    fileSize: 4 * 1024 * 1024, 
   },
 });
 
