@@ -1,59 +1,53 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { prisma } from '../config/prismaClient';
-import { v2 as cloudinary } from 'cloudinary';
 import bcrypt from 'bcryptjs';
+import AppError from '../utils/AppError';
+import ApiResponse from '../utils/ApiResponse';
+import { userService } from '../services/user.services';
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, email, password, phoneNumber, role } = req.body;
 
     if (!name || !email || !password || !req.file) {
-      return res.status(400).json({
-        success: false,
-        message: 'Name, email, password and avatar image are required',
-      });
+      return next(
+        new AppError(
+          `Name, email, password and avatar image are required`,
+          400,
+          false
+        )
+      );
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await userService.isUserExists(email);
 
     if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: 'User with this email already exists',
-      });
+      return next(
+        new AppError(`User with this email already exists`, 409, false)
+      );
     }
 
-    const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-      folder: 'avatars',
-    });
+    const uploadResult = await userService.uploadToCloudinary(req.file.path);
 
+    if (!uploadResult || !uploadResult.secure_url) {
+      return next(new AppError('Failed to upload avatar image', 500, false));
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        phoneNumber,
-        role: role || 'user',
-        avatar: uploadResult.secure_url,
-      },
+    const user = await userService.createUser({
+      name,
+      email,
+      password: hashedPassword,
+      phoneNumber,
+      role: role || 'user',
+      avatar: uploadResult.secure_url,
     });
 
-    return res.status(201).json({
-      success: true,
-      message: 'User created successfully',
-      data: user,
-    });
+    return res
+      .status(201)
+      .json(new ApiResponse(201, 'User created successfully', user));
   } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error',
-      error: error.message,
-    });
+    return next(new AppError(error.message || 'Server error', 500, false));
   }
 };
 

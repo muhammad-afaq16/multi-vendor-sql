@@ -10,7 +10,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.use(morgan('dev')); // morgan = HTTP request logger middleware for node.js
+app.use(morgan('short')); // morgan = HTTP request logger middleware for node.js
 app.use(helmet()); // helmet = secure HTTP headers.
 app.use(express.urlencoded({ extended: true }));
 
