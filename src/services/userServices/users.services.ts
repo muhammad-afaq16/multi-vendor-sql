@@ -17,6 +17,17 @@ class UserService {
     });
   }
 
+  async userFindById(userId: number) {
+    return await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+  }
+
   async uploadToCloudinary(filePath: string) {
     return await cloudinary.uploader.upload(filePath, {
       folder: 'avatars',
@@ -96,7 +107,7 @@ class UserService {
         email: true,
         role: true,
         avatar: true,
-        addresses: true, 
+        addresses: true,
       },
     });
   }

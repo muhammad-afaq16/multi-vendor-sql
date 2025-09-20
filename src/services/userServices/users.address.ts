@@ -8,16 +8,6 @@ class UserAddressService {
   constructor(prismaClient: PrismaClient) {
     this.prisma = prismaClient;
   }
-  async userFindById(userId: number) {
-    return await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-      },
-    });
-  }
   async createUserAddress(data: Address) {
     const { country, city, state, street, zipCode, addressType, userId } = data;
 

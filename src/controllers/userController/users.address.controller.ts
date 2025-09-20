@@ -3,6 +3,7 @@ import ApiResponse from '../../utils/ApiResponse';
 import AppError from '../../utils/AppError';
 import catchAsync from '../../utils/catchAsync';
 import { userAddressService } from '../../services/userServices/users.address';
+import { userService } from '../../services/userServices/users.services';
 
 const createUserAddress = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -22,7 +23,7 @@ const createUserAddress = catchAsync(
       );
     }
 
-    const user = await userAddressService.userFindById(userId);
+    const user = await userService.userFindById(userId);
 
     if (!user) {
       return next(new AppError('User not found', 404, false));
