@@ -87,6 +87,19 @@ class UserService {
       data: { refreshToken },
     });
   }
+
+  async getAllUsers() {
+    return await this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        avatar: true,
+        addresses: true, 
+      },
+    });
+  }
 }
 
 export const userService = new UserService(prisma);

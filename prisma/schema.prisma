@@ -13,6 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+enum Role {
+  CUSTOMER
+  SELLER
+  ADMIN
+}
+
 model User {
   id           Int     @id @default(autoincrement())
   name         String
@@ -20,7 +27,7 @@ model User {
   password     String
   phoneNumber  String?
   avatar       String?
-  role         String  @default("user")
+  role         Role @default(CUSTOMER)
   refreshToken String? @map("refresh_token")
 
   addresses          Address[] // It let you to do nested queries (getting address) While staying at user

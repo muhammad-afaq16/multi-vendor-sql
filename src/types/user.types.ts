@@ -1,10 +1,12 @@
+import { Role } from './enums';
+
 export type User = {
   id?: number;
   name: string;
   email: string;
   password: string;
   phoneNumber?: string | null;
-  role?: string;
+  role?: Role;
   avatar?: string | null;
   refreshToken?: string | null;
   resetPasswordToken?: string | null;
