@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import ApiResponse from '../../utils/ApiResponse';
 import AppError from '../../utils/AppError';
 import catchAsync from '../../utils/catchAsync';
-import { userAddressService } from '../../services/userServices/users.address';
-import { userService } from '../../services/userServices/users.services';
+import { userService } from '../users/user.service';
+import { userAddressService } from './address.service';
+
 
 const createUserAddress = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

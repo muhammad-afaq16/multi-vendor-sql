@@ -5,8 +5,8 @@ import cors from 'cors';
 import { errorHandler } from './middleware/errorHandler';
 import AppError from './utils/AppError';
 import { v2 as cloudinary } from 'cloudinary';
-import userRouter from './routes/userRoutes/users.route';
-import addressRouter from './routes/userRoutes/address.route';
+import userRouter from './features/users/user.routes';
+import addressRouter from './features/addresses/address.routes';
 import dotenv from 'dotenv';
 
 if (process.env.NODE_ENV !== 'PRODUCTION') {

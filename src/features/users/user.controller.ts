@@ -2,22 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import AppError from '../../utils/AppError';
 import ApiResponse from '../../utils/ApiResponse';
-import { userService } from '../../services/userServices/users.services';
 import catchAsync from '../../utils/catchAsync';
+import { userService } from './user.service';
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, password, phoneNumber, role } = req.body;
-
-    if (!name || !email || !password || !req.file) {
-      return next(
-        new AppError(
-          `Name, email, password and avatar image are required`,
-          400,
-          false
-        )
-      );
-    }
 
     const existingUser = await userService.isUserExists(email);
 
@@ -26,9 +16,10 @@ const createUser = catchAsync(
         new AppError(`User with this email already exists`, 409, false)
       );
     }
-
-    const uploadResult = await userService.uploadToCloudinary(req.file.path);
-
+    let uploadResult;
+    if (req.file) {
+      uploadResult = await userService.uploadToCloudinary(req.file.path);
+    }
     if (!uploadResult || !uploadResult.secure_url) {
       return next(new AppError('Failed to upload avatar image', 500, false));
     }
