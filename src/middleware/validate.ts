@@ -12,7 +12,6 @@ export function validate(
       next();
     } catch (err) {
       if (err instanceof ZodError) {
-        // Map errors into simpler form
         const errors = err.issues.map((issue) => ({
           field: issue.path.join('.'), // "email", "role", etc.
           message: issue.message,
@@ -21,7 +20,7 @@ export function validate(
         return res.status(400).json({
           status: 'error',
           message: 'Validation failed',
-          errors, // only the relevant info
+          errors, 
         });
       }
       next(err);
