@@ -15,7 +15,6 @@ datasource db {
 
 enum Role {
   CUSTOMER
-  SELLER
   ADMIN
 }
 
@@ -23,6 +22,7 @@ model User {
   id           Int     @id @default(autoincrement())
   name         String
   email        String  @unique
+  verified     Boolean @default(false)
   password     String
   phoneNumber  String?
   avatar       String?
@@ -30,8 +30,6 @@ model User {
   refreshToken String? @map("refresh_token")
 
   addresses          Address[] // It let you to do nested queries (getting address) While staying at user
-  resetPasswordToken String?
-  resetPasswordTime  DateTime?
   createdAt          DateTime  @default(now())
 
   @@map("users")

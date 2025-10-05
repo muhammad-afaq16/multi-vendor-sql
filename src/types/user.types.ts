@@ -7,20 +7,19 @@ export type User = {
   password: string;
   phoneNumber?: string | null;
   role?: Role;
+  verified?: boolean;
   avatar?: string | null;
   refreshToken?: string | null;
-  resetPasswordToken?: string | null;
-  resetPasswordTime?: Date | null;
   createdAt?: Date;
 };
 
 export type Address = {
   id?: number;
-  country: string | null;
-  city: string | null;
-  state: string | null;
-  street: string | null;
-  zipCode: string | null;
-  addressType: string | null;
+  country: string;
+  city: string;
+  state: string;
+  street: string;
+  zipCode: string;
+  addressType: string;
   userId: number;
 };

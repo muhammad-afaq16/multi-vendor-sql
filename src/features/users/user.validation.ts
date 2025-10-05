@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { Role } from '../../types/enums';
 
 export const userSchema = z.object({
   name: z
@@ -9,5 +8,4 @@ export const userSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(4, 'Password must be at least 4 characters'),
   phoneNumber: z.string().optional(),
-  role: z.nativeEnum(Role).optional(),
 });
