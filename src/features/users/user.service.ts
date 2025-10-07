@@ -124,7 +124,12 @@ class UserService {
     });
   }
 
-  async generateVerificationToken(user: User): Promise<string> {
+  async findRefreshToken(incomingRefreshToken: string) {
+    return await this.prisma.user.findFirst({
+      where: { refreshToken: incomingRefreshToken },
+    });
+  }
+  async generateJwtTokenForUser(user: User): Promise<string> {
     const secret: Secret | undefined = process.env.VERIFICATION_SECRET_KEY;
     if (!secret) {
       throw new Error('VERIFICATION_SECRET_KEY is not defined in environment');

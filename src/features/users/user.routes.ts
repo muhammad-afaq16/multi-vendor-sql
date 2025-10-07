@@ -4,6 +4,7 @@ import {
   forgotPassword,
   getAllUsers,
   loginUser,
+  refreshAccessToken,
   resetPassword,
   updateUser,
   verifyEmail,
@@ -24,8 +25,9 @@ router.get(
   verifyEmail
 );
 router.post('/forgot-password', forgotPassword);
-router.get('/reset-password', resetPassword);
+router.patch('/reset-password', resetPassword);
 router.post('/login', loginUser);
+router.post('/refresh-token', refreshAccessToken);
 router.patch(
   '/update-user',
   authMiddleware,

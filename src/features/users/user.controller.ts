@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { CookieOptions, NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import AppError from '../../utils/AppError';
 import ApiResponse from '../../utils/ApiResponse';
@@ -7,6 +7,7 @@ import { userService } from './user.service';
 import { sendEmail } from '../../utils/sendEmail';
 import { promises as fs } from 'fs';
 import path from 'path';
+import jwt from 'jsonwebtoken';
 
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -20,7 +21,7 @@ const createUser = catchAsync(
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const verificationToken = await userService.generateVerificationToken({
+    const verificationToken = await userService.generateJwtTokenForUser({
       name,
       email,
       password: hashedPassword,
@@ -118,12 +119,20 @@ const loginUser = catchAsync(
 
     await userService.saveRefreshToken(user.id, refreshToken);
 
+    const cookieOptions: CookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict', // CSRF protection
+      maxAge: Number(process.env.REFRESH_TOKEN_COOKIE_MAX_AGE), // 7 days, matches refresh token expiry
+    };
+
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+
     const { password: _, refreshToken: __, ...userData } = user;
 
     return res.status(200).json(
       new ApiResponse(200, 'Login successful', {
         accessToken,
-        refreshToken,
         user: userData,
       })
     );
@@ -203,7 +212,9 @@ const resetPassword = catchAsync(
     }
 
     if (!password || !confirmPassword) {
-      new AppError('Please provide a new password and confirm it.', 400);
+      return next(
+        new AppError('Please provide a new password and confirm it.', 400)
+      );
     }
 
     if (password !== confirmPassword) {
@@ -214,7 +225,6 @@ const resetPassword = catchAsync(
 
     await userService.updatePassword(user.id, hashedPassword);
 
-    // 6. Send success response
     res
       .status(200)
       .json(new ApiResponse(200, 'Your password has been reset successfully.'));
@@ -288,6 +298,72 @@ const updateUser = catchAsync(
   }
 );
 
+const refreshAccessToken = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // I need to call this end-point only when the User **--- Was Logged-In ---** within 15 minutes.
+    const incomingRefreshToken = req.cookies?.refreshToken;
+
+    if (!incomingRefreshToken) {
+      return next(
+        new AppError('You are not authenticated. Please log in.', 401)
+      );
+    }
+    // If do, We have Cookies............. match with db
+    const storedToken = await userService.findRefreshToken(
+      incomingRefreshToken
+    );
+
+    if (!storedToken) {
+      return next(
+        new AppError('Invalid refresh token. Please log in again.', 403)
+      );
+    }
+
+    let decodedPayload: any;
+    try {
+      decodedPayload = jwt.verify(
+        incomingRefreshToken,
+        process.env.REFRESH_TOKEN_SECRET as string
+      );
+    } catch (err) {
+      return next(
+        new AppError(
+          'Refresh token expired or invalid. Please log in again.',
+          403
+        )
+      );
+    }
+
+    const user = await userService.userFindById(decodedPayload.id);
+    if (!user) {
+      return next(
+        new AppError('User associated with this token no longer exists.', 403)
+      );
+    }
+
+    // 5. Generate a new pair of tokens (Token Rotation)
+    const newAccessToken = await userService.generateAccessToken(user.id);
+    const newRefreshToken = await userService.generateRefreshToken(user.id);
+
+    await userService.saveRefreshToken(user.id, newRefreshToken);
+
+    const cookieOptions: CookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: Number(process.env.REFRESH_TOKEN_COOKIE_MAX_AGE),
+    };
+
+    res.cookie('refreshToken', newRefreshToken, cookieOptions);
+
+    return res.status(200).json(
+      new ApiResponse(200, 'Token refreshed successfully', {
+        accessToken: newAccessToken,
+      })
+    );
+  }
+);
+
 const updateAvatar = catchAsync(async () => {
   // This controller purpose is only to update the avatar of user. Do I really I need this? I think
   // I think I do not need this because my updateUser is doing this job by using patch.
@@ -311,4 +387,5 @@ export {
   forgotPassword,
   resetPassword,
   updateUser,
+  refreshAccessToken,
 };
