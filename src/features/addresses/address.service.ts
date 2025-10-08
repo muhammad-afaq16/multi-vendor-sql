@@ -23,6 +23,15 @@ class UserAddressService {
       },
     });
   }
+
+  async isAddressTypeExist(userId: number, addressType: string) {
+    return this.prisma.address.findFirst({
+      where: {
+        userId: userId, // There should be userId, I was using id:userId which basically wrong db call
+        addressType: addressType,
+      },
+    });
+  }
 }
 
 export const userAddressService = new UserAddressService(prisma);

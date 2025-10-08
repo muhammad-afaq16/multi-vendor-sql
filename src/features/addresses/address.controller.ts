@@ -5,29 +5,25 @@ import catchAsync from '../../utils/catchAsync';
 import { userService } from '../users/user.service';
 import { userAddressService } from './address.service';
 
-
 const createUserAddress = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = Number(req.params.id);
-    if (isNaN(userId)) {
-      return next(new AppError('Invalid user id', 400, false));
-    }
-    const { addressType, street, city, state, zipCode, country } = req.body;
+    const userId = Number(req.user?.id);
 
-    if (!addressType || !street || !city || !state || !zipCode || !country) {
-      return next(
-        new AppError(
-          'Address type, street, city, state, zip code and country are required',
-          400,
-          false
-        )
-      );
-    }
+    const { addressType, street, city, state, zipCode, country } = req.body;
 
     const user = await userService.userFindById(userId);
 
     if (!user) {
       return next(new AppError('User not found', 404, false));
+    }
+
+    const isAddressExist = await userAddressService.isAddressTypeExist(
+      userId,
+      addressType
+    );
+
+    if (isAddressExist) {
+      return next(new AppError('Address already exist', 409, false));
     }
 
     const savingAddress = await userAddressService.createUserAddress({
