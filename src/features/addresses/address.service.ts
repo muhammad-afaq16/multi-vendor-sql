@@ -24,11 +24,32 @@ class UserAddressService {
     });
   }
 
-  async isAddressTypeExist(userId: number, addressType: string) {
+  async findAddressByType(userId: number, addressType: string) {
     return this.prisma.address.findFirst({
       where: {
         userId: userId, // There should be userId, I was using id:userId which basically wrong db call
         addressType: addressType,
+      },
+    });
+  }
+
+  async findAddressesByUserId(userId: number) {
+    return this.prisma.address.findMany({
+      where: { userId: userId },
+    });
+  }
+
+  async updateUserAddress(addressId: number, data: Partial<Address>) {
+    return this.prisma.address.update({
+      where: { id: addressId },
+      data,
+    });
+  }
+
+  async deleteUserAddress(addressId: number) {
+    return this.prisma.address.delete({
+      where: {
+        id: addressId,
       },
     });
   }

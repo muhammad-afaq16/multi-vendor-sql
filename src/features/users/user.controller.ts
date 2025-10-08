@@ -233,11 +233,8 @@ const resetPassword = catchAsync(
 
 const updateUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user?.id;
+    const userId = Number(req.user?.id);
 
-    if (!userId) {
-      return next(new AppError('User not found', 404));
-    }
     const user = await userService.userFindById(userId);
 
     if (!user) {
