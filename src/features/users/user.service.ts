@@ -1,7 +1,7 @@
 import { prisma } from '../../config/prismaClient';
 import { PrismaClient } from '@prisma/client';
 import { v2 as cloudinary } from 'cloudinary';
-import { User } from '../../types/user.types';
+import { User } from '../../types/types';
 import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
 class UserService {

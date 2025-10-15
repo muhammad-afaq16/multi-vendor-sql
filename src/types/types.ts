@@ -12,6 +12,18 @@ export type User = {
   refreshToken?: string | null;
   createdAt?: Date;
 };
+export type Shop = {
+  id?: number;
+  name: string;
+  email: string;
+  password: string;
+  phoneNumber?: string | null;
+  description: string;
+  verified?: boolean;
+  avatar?: string | null;
+  refreshToken?: string | null;
+  createdAt?: Date;
+};
 
 export type Address = {
   id?: number;

@@ -1,6 +1,6 @@
 import { prisma } from '../../config/prismaClient';
 import { PrismaClient } from '@prisma/client';
-import { Address } from '../../types/user.types';
+import { Address } from '../../types/types';
 
 class UserAddressService {
   private prisma: PrismaClient;

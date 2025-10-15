@@ -17,6 +17,9 @@ enum Role {
   CUSTOMER
   ADMIN
 }
+enum ShopRole {
+ SELLER
+}
 
 model User {
   id           Int     @id @default(autoincrement())
@@ -27,12 +30,12 @@ model User {
   phoneNumber  String?
   avatar       String?
   role         Role    @default(CUSTOMER)
-  refreshToken String? @map("refresh_token")
+  refreshToken String? @map("refresh_token") // db column name will be refresh_token but codebase will used refreshToken
 
   addresses          Address[] // It let you to do nested queries (getting address) While staying at user
   createdAt          DateTime  @default(now())
 
-  @@map("users")
+  @@map("users") // Table name in db will be users but codebase will use model table as User
 }
 
 model Address {
@@ -48,4 +51,22 @@ model Address {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("addresses")
+}
+
+model Shop {
+   id           Int     @id @default(autoincrement())
+  name         String
+  email        String  @unique
+  password     String
+  description  String
+  phoneNumber  String?
+  avatar       String?
+  role         ShopRole   @default(SELLER)
+  verified     Boolean @default(false)
+
+
+  refreshToken String? @map("refresh_token")
+  createdAt          DateTime  @default(now())
+
+  @@map("shops")
 }

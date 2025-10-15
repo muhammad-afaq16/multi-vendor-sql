@@ -47,11 +47,7 @@ const createUser = catchAsync(
     return res
       .status(201)
       .json(
-        new ApiResponse(
-          201,
-          'Please check your email to verify your account.',
-          { user }
-        )
+        new ApiResponse(201, 'Please check your email to verify your account.')
       );
   }
 );
