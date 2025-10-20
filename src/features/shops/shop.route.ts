@@ -1,7 +1,10 @@
 import express from 'express';
 
 import { validate } from '../../middleware/validate';
-import { authMiddleware } from '../../middleware/authMiddleware';
+import {
+  authMiddleware,
+  shopMiddleware,
+} from '../../middleware/authMiddleware';
 import { verifyLimiter } from '../../middleware/verifyLimiter';
 import upload from '../../middleware/multer';
 import {
@@ -9,6 +12,7 @@ import {
   forgotPassword,
   loginSeller,
   resetPassword,
+  updateUserProfile,
   verifyEmail,
 } from './shop.controller';
 import { shopSchema } from './shop.validation';
@@ -21,5 +25,11 @@ router.get('/verify-email', verifyLimiter, verifyEmail);
 router.post('/login', loginSeller);
 router.post('/forgot-password', forgotPassword);
 router.patch('/reset-password', resetPassword); // only updating password that's why patch
+router.patch(
+  '/update-shop-profile',
+  shopMiddleware,
+  upload.single('avatar'),
+  updateUserProfile
+);
 
 export default router;
