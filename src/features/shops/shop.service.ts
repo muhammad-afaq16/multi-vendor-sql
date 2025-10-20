@@ -132,6 +132,18 @@ class ShopService {
       data: { password: hashedPassword },
     });
   }
+
+  async updateShop(
+    shopId: number,
+    payload: Partial<
+      Pick<Shop, 'name' | 'password' | 'avatar' | 'phoneNumber' | 'description'>
+    >
+  ) {
+    return this.prisma.shop.update({
+      where: { id: shopId },
+      data: payload,
+    });
+  }
 }
 
 export const shopService = new ShopService(prisma);

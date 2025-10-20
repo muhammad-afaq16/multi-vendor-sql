@@ -6,6 +6,8 @@ import bcrypt from 'bcryptjs';
 import { sendEmail } from '../../utils/sendEmail';
 import ApiResponse from '../../utils/ApiResponse';
 import { userService } from '../users/user.service';
+import path from 'path';
+import fs from 'fs/promises';
 
 const createShop = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -205,7 +207,74 @@ const resetPassword = catchAsync(
 );
 
 const updateUserProfile = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {}
+  async (req: Request, res: Response, next: NextFunction) => {
+    const shopId = Number(req.shop?.id);
+
+    const shop = await shopService.getShopById(shopId);
+
+    if (!shop) {
+      return next(new AppError('Shop not found', 404));
+    }
+
+    const dataToUpdate: {
+      name?: string;
+      password?: string;
+      phoneNumber?: string | null;
+      avatar?: string;
+      description?: string;
+    } = {};
+
+    if (req.body.name) {
+      dataToUpdate.name = req.body.name;
+    }
+
+    if ('phoneNumber' in req.body) {
+      dataToUpdate.phoneNumber = req.body.phoneNumber;
+    }
+
+    if (req.body.password) {
+      dataToUpdate.password = await bcrypt.hash(req.body.password, 10);
+    }
+
+    if (req.file) {
+      if (shop.avatar) {
+        const publicIdMatch = shop.avatar.match(/\/v\d+\/(.+)\.\w+$/);
+        const publicId = publicIdMatch ? publicIdMatch[1] : null;
+
+        if (publicId) {
+          await userService.deleteFromCloudinary(publicId);
+        }
+      }
+
+      const uploadResult = await userService.uploadToCloudinary(req.file.path);
+      dataToUpdate.avatar = uploadResult.secure_url;
+      const filePath = path.resolve(req.file.path);
+      try {
+        await fs.unlink(filePath);
+        console.log('Local file deleted');
+      } catch (err) {
+        console.error('Error deleting local file:', err);
+      }
+    }
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      return next(new AppError('No data provided to update.', 400));
+    }
+    const updatedShop = await shopService.updateShop(shop.id, dataToUpdate);
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Profile updated successfully',
+      user: updatedShop,
+    });
+  }
 );
 
-export { createShop, verifyEmail, loginSeller, forgotPassword, resetPassword };
+export {
+  createShop,
+  verifyEmail,
+  loginSeller,
+  forgotPassword,
+  resetPassword,
+  updateUserProfile,
+};
