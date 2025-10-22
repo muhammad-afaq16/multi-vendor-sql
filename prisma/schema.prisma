@@ -17,8 +17,9 @@ enum Role {
   CUSTOMER
   ADMIN
 }
+
 enum ShopRole {
- SELLER
+  SELLER
 }
 
 model User {
@@ -32,8 +33,8 @@ model User {
   role         Role    @default(CUSTOMER)
   refreshToken String? @map("refresh_token") // db column name will be refresh_token but codebase will used refreshToken
 
-  addresses          Address[] // It let you to do nested queries (getting address) While staying at user
-  createdAt          DateTime  @default(now())
+  addresses Address[] // It let you to do nested queries (getting address) While staying at user
+  createdAt DateTime  @default(now())
 
   @@map("users") // Table name in db will be users but codebase will use model table as User
 }
@@ -54,19 +55,58 @@ model Address {
 }
 
 model Shop {
-   id           Int     @id @default(autoincrement())
-  name         String
-  email        String  @unique
-  password     String
-  description  String
-  phoneNumber  String?
-  avatar       String?
-  role         ShopRole   @default(SELLER)
-  verified     Boolean @default(false)
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String   @unique
+  password    String
+  description String
+  phoneNumber String?
+  avatar      String?
+  role        ShopRole @default(SELLER)
+  verified    Boolean  @default(false)
 
-
-  refreshToken String? @map("refresh_token")
-  createdAt          DateTime  @default(now())
+  refreshToken String?   @map("refresh_token")
+  createdAt    DateTime  @default(now())
+  Product      Product[]
 
   @@map("shops")
+}
+
+model Product {
+   id            Int       @id @default(autoincrement())
+  name          String
+  description   String
+  images        String[]
+  originalPrice Float
+  discountPrice Float?     // nullable when no discount
+  currency      String     @default("PKR")
+
+  
+  categoryId    Int
+  category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  shopId        Int
+  shop          Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+
+  tags          String[]   // example: ["laptop", "electronics", "apple"]
+
+  stock         Int        @default(0)
+  soldCount     Int        @default(0)
+  isAvailable   Boolean    @default(true)
+
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([categoryId])
+  @@index([shopId])
+  @@map("products")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  products  Product[] 
+
+  @@map("categories")
 }
