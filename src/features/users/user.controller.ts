@@ -175,6 +175,13 @@ const forgotPassword = catchAsync(
   }
 );
 
+//  Backend endpoint exactly the same.
+// But change your email link to point to your frontend, not your backend.
+// Example: const resetUrl = `${process.env.FRONTEND_BASE_URL}/reset-password?token=${resetToken}`;
+// Then:
+// The user clicks that link → it opens your frontend’s /reset-password page.=
+// The frontend extracts the token → calls your backend PATCH /api/v1/shops/reset-password?token=... with the new password
+
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { token } = req.query;

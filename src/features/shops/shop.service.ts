@@ -33,6 +33,14 @@ class ShopService {
     return jwt.sign(shop, secret, options);
   }
 
+  async verifyEmailToken(token: string): Promise<JwtPayload | string> {
+    const secret: Secret | undefined = process.env.SHOP_VERIFICATION_SECRET_KEY;
+    if (!secret) {
+      throw new Error('SHOP_VERIFICATION_SECRET_KEY is not defined');
+    }
+    return jwt.verify(token, secret);
+  }
+
   async createShop(shopData: Shop) {
     const { name, email, password, phoneNumber, description } = shopData;
 
@@ -119,6 +127,13 @@ class ShopService {
     const payload = { id: userId } as Record<string, unknown>;
 
     return jwt.sign(payload, secret, options) as string;
+  }
+  async shopResetPasswordVerifyEmailToken(token: string): Promise<JwtPayload | string> {
+    const secret: Secret | undefined = process.env.SHOP_RESET_PASSWORD_SECRET_KEY;
+    if (!secret) {
+      throw new Error('SHOP_RESET_PASSWORD_SECRET_KEY is not defined');
+    }
+    return jwt.verify(token, secret);
   }
 
   async getShopById(shopId: number) {

@@ -62,11 +62,11 @@ const verifyEmail = catchAsync(
       );
     }
 
-    const decoded = (await userService.verifyEmailToken(token)) as any;
+    const decoded = (await shopService.verifyEmailToken(token)) as any;
 
     const { name, email, password, phoneNumber, description } = decoded as any;
 
-    const user = await shopService.createShop({
+    const shop = await shopService.createShop({
       name,
       email,
       password,
@@ -74,6 +74,16 @@ const verifyEmail = catchAsync(
       description,
       verified: true,
     });
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          'Email verified successfully! You can now log in.',
+          shop
+        )
+      );
   }
 );
 
@@ -157,7 +167,7 @@ const forgotPassword = catchAsync(
       <br>
       <p>Best regards,<br>The Team</p>
     `;
-    await sendEmail(email, subject, html);
+    await sendEmail(shop.email, subject, html);
 
     return res
       .status(200)
@@ -176,7 +186,9 @@ const resetPassword = catchAsync(
       return next(new AppError('Reset token is missing or invalid', 400));
     }
 
-    const decoded = (await userService.verifyEmailToken(token)) as any;
+    const decoded = (await shopService.shopResetPasswordVerifyEmailToken(
+      token
+    )) as any;
 
     const { id } = decoded as any;
 

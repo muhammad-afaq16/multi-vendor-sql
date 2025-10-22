@@ -20,11 +20,14 @@ import { shopSchema } from './shop.validation';
 const router = express.Router();
 
 router.post('/create-shop', validate(shopSchema), createShop);
-router.get('/verify-email', verifyLimiter, verifyEmail);
+router.get('/verify-email', verifyEmail);
 
 router.post('/login', loginSeller);
 router.post('/forgot-password', forgotPassword);
+// 
 router.patch('/reset-password', resetPassword); // only updating password that's why patch
+
+// Fixing above
 router.patch(
   '/update-shop-profile',
   shopMiddleware,
