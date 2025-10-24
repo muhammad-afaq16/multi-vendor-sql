@@ -35,3 +35,8 @@ export type Address = {
   addressType: string;
   userId: number;
 };
+
+export type Category = {
+  id?: number;
+  name: string;
+};

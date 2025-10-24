@@ -8,6 +8,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import userRouter from './features/users/user.routes';
 import addressRouter from './features/addresses/address.routes';
 import shopRouter from './features/shops/shop.route';
+import categoryRouter from './features/category/category.routes';
 import dotenv from 'dotenv';
 
 if (process.env.NODE_ENV !== 'PRODUCTION') {
@@ -35,6 +36,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/address', addressRouter);
 app.use('/api/v1/shops', shopRouter);
+app.use('/api/v1/categories', categoryRouter);
 
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));

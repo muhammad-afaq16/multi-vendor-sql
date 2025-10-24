@@ -46,6 +46,8 @@ coverage/
 *.swp
 *.swo
 /*.md.txt
+/*prisma.txt
+/*.txt
 # Cache
 .cache/
 .eslintcache
